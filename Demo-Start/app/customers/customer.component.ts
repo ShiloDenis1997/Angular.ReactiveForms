@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import {
     FormGroup,
     FormBuilder,
+    FormArray,
     Validators,
     AbstractControl,
     ValidatorFn
@@ -53,6 +54,10 @@ export class CustomerComponent implements OnInit {
         pattern: 'Please enter a valid email address.'
     }
 
+    get addresses(): FormArray {
+        return <FormArray>this.customerForm.get('addresses');
+    }
+
     constructor(private fb: FormBuilder) { }
 
     ngOnInit(): void {
@@ -66,7 +71,8 @@ export class CustomerComponent implements OnInit {
             sendCatalog: true,
             phone: '',
             notification: 'email',
-            rating: ['', ratingRange(this.minRating, this.maxRating)]
+            rating: ['', ratingRange(this.minRating, this.maxRating)],
+            addresses: this.fb.array([this.buildAddresses()])
         });
         this.customerForm.get('notification').valueChanges
             .subscribe(value => this.setNotification(value), error => console.log(error));
@@ -104,5 +110,20 @@ export class CustomerComponent implements OnInit {
                 messages[key]).join(' ');
         }
         return message;
+    }
+
+    addAddress(): void {
+        this.addresses.push(this.buildAddresses());
+    }
+
+    buildAddresses(): FormGroup {
+        return this.fb.group({
+            addressType: 'home',
+            street1: '',
+            street2: '',
+            city: '',
+            state: '',
+            zip: ''
+        })
     }
 }
